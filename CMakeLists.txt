@@ -22,17 +22,28 @@ FetchContent_Declare(Catch2
 )
 FetchContent_MakeAvailable(Catch2)
 
-# Build target 'main'
+include(FetchContent)
+FetchContent_Declare(Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG v3.16.0
+    GIT_SHALLOW ON
+    EXCLUDE_FROM_ALL
+    SYSTEM
+)
+FetchContent_MakeAvailable(Catch2)
+
+# Build exec 'main'
 add_executable(main src/main.cpp)
 target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE SFML::Graphics)
 
-# Build target 'tests'
+# Build exec 'tests'
 add_executable(tests tests/maintest.cpp)
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
 
-list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 include(CTest)
+enable_testing()
+list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 include(Catch)
 catch_discover_tests(tests)
 
@@ -43,7 +54,8 @@ add_custom_target(run
     USES_TERMINAL
 )
 
-add_custom_target(catchtest 
+# Target 'testproject'
+add_custom_target(testproject
     COMMAND $<TARGET_FILE:tests>
     DEPENDS tests
     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}

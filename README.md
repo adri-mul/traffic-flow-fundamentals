@@ -6,10 +6,8 @@ Reconfigure build target with:
 Run with:
 `cmake --build build --target run`
 
-Test with:
-`cmake --build build --target tests`
-then
-`ctest --output-on-failure`
+Test project with:
+`ctest --test-dir build --output-on-failure`
 
 https://public.ridereport.com/austin?x=-97.8169255&y=30.1761038&z=14.93
 
