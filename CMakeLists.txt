@@ -33,7 +33,7 @@ FetchContent_Declare(Catch2
 FetchContent_MakeAvailable(Catch2)
 
 # Build exec 'main'
-add_executable(main src/main.cpp)
+add_executable(main src/main.cpp src/graph.cpp)
 target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE SFML::Graphics)
 
