@@ -1,0 +1,43 @@
+{
+    "intersections": [
+        {"id": 0, "name": "Cedar Ave / North Loop", "x": 100, "y": 100},
+        {"id": 1, "name": "Oak Ave / North Loop", "x": 250, "y": 100},
+        {"id": 2, "name": "Main St / North Loop", "x": 400, "y": 100},
+        {"id": 3, "name": "River Rd / North Loop", "x": 550, "y": 100},
+        {"id": 4, "name": "Pine Ave / North Loop", "x": 700, "y": 100},
+        {"id": 5, "name": "Cedar Ave / Willow St", "x": 100, "y": 300},
+        {"id": 6, "name": "Oak Ave / Willow St", "x": 250, "y": 300},
+        {"id": 7, "name": "Main St / Willow St", "x": 400, "y": 300},
+        {"id": 8, "name": "River Rd / Willow St", "x": 550, "y": 300},
+        {"id": 9, "name": "Pine Ave / Willow St", "x": 700, "y": 300},
+        {"id": 10, "name": "Cedar Ave / South Blvd", "x": 100, "y": 500},
+        {"id": 11, "name": "Oak Ave / South Blvd", "x": 250, "y": 500},
+        {"id": 12, "name": "Main St / South Blvd", "x": 400, "y": 500},
+        {"id": 13, "name": "River Rd / South Blvd", "x": 550, "y": 500},
+        {"id": 14, "name": "Pine Ave / South Blvd", "x": 700, "y": 500}
+    ],
+    "roads": [
+        {"intersections": [0, 1], "directional": false},
+        {"intersections": [1, 2], "directional": false},
+        {"intersections": [2, 3], "directional": false},
+        {"intersections": [3, 4], "directional": false},
+        {"intersections": [5, 6], "directional": true},
+        {"intersections": [6, 7], "directional": true},
+        {"intersections": [7, 8], "directional": true},
+        {"intersections": [8, 9], "directional": true},
+        {"intersections": [14, 13], "directional": true},
+        {"intersections": [13, 12], "directional": true},
+        {"intersections": [12, 11], "directional": true},
+        {"intersections": [11, 10], "directional": true},
+        {"intersections": [0, 5], "directional": false},
+        {"intersections": [5, 10], "directional": false},
+        {"intersections": [1, 6], "directional": false},
+        {"intersections": [6, 11], "directional": false},
+        {"intersections": [2, 7], "directional": false},
+        {"intersections": [7, 12], "directional": false},
+        {"intersections": [3, 8], "directional": false},
+        {"intersections": [8, 13], "directional": false},
+        {"intersections": [4, 9], "directional": false},
+        {"intersections": [9, 14], "directional": false}
+    ]
+}

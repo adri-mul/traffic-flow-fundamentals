@@ -22,20 +22,19 @@ FetchContent_Declare(Catch2
 )
 FetchContent_MakeAvailable(Catch2)
 
-include(FetchContent)
-FetchContent_Declare(Catch2
-    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-    GIT_TAG v3.16.0
+FetchContent_Declare(nlohmann_json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG v3.12.0
     GIT_SHALLOW ON
     EXCLUDE_FROM_ALL
     SYSTEM
 )
-FetchContent_MakeAvailable(Catch2)
+FetchContent_MakeAvailable(nlohmann_json)
 
 # Build exec 'main'
-add_executable(main src/main.cpp src/graph.cpp)
+add_executable(main src/main.cpp src/roadNetwork.cpp src/synthesizeNetwork.cpp)
 target_compile_features(main PRIVATE cxx_std_17)
-target_link_libraries(main PRIVATE SFML::Graphics)
+target_link_libraries(main PRIVATE SFML::Graphics nlohmann_json::nlohmann_json)
 
 # Build exec 'tests'
 add_executable(tests tests/maintest.cpp)
@@ -61,6 +60,10 @@ add_custom_target(testproject
     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
     USES_TERMINAL
 )
+
+# Move data files into build
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # Run the project with F7
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT main)
