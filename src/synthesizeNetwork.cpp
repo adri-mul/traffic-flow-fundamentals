@@ -22,9 +22,9 @@ RoadNetwork synthesizeNetworkFromFile(const std::string& filename) {
             throw std::runtime_error("'intersections' and 'roads' must be arrays");
         }
 
-        vector<unique_ptr<node>> ownedNodes;  // list of nodes with unique_ptr attached to them (used to clean up at the end)
-        vector<node*> vertices;
-        unordered_map<int, node*> nodesById;
+        vector<unique_ptr<Intersection>> ownedNodes;  // list of nodes with unique_ptr attached to them (used to clean up at the end)
+        vector<Intersection*> vertices;
+        unordered_map<int, Intersection*> nodesById;
         ownedNodes.reserve(intersections.size());
         vertices.reserve(intersections.size());
 
@@ -34,7 +34,7 @@ RoadNetwork synthesizeNetworkFromFile(const std::string& filename) {
             const double x = intersection.at("x").get<double>();
             const double y = intersection.at("y").get<double>();
 
-            auto intersectionNode = make_unique<node>(id, name, x, y);
+            auto intersectionNode = make_unique<Intersection>(id, name, x, y);
             if (!nodesById.emplace(id, intersectionNode.get()).second) { // If the map has more than one element with key 'id', .second returns false (fail)
                 throw std::runtime_error("Duplicate intersection id: " + to_string(id));
             }
@@ -58,14 +58,17 @@ RoadNetwork synthesizeNetworkFromFile(const std::string& filename) {
             }
             
             // second gets the pointer. firstNode is unordered_map<int, node*>.
-            firstNode->second->connections.push_back(secondNode->second);
+            RoadSegment segment = {firstNode->second, secondNode->second};
+            firstNode->second->connections.push_back(&segment);
             if (!road.at("directional").get<bool>()) {
-                secondNode->second->connections.push_back(firstNode->second);
+                RoadSegment segmentNonDirectional = {secondNode->second, firstNode->second};
+                secondNode->second->connections.push_back(&segmentNonDirectional);
             }
+
+            g.addVertices(vertices);
         }
 
-        g.addVertices(vertices);
-        for (unique_ptr<node>& intersectionNode : ownedNodes) {
+        for (unique_ptr<Intersection>& intersectionNode : ownedNodes) {
             intersectionNode.release();
         }
         infile.close();
