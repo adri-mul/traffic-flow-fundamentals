@@ -3,5 +3,8 @@
 struct Agents {
     public:
         void broadcastAgentPositions(double* positions, int numAgents);  // positions is an array of the x,y coordinates for n agents. Thus, the array size is numAgents * 2
-        void initAgents(int numAgents);
+        /*
+        Initializes Agent States randomly based on a seed
+         */
+        void initAgentStates(int numAgents);
 };

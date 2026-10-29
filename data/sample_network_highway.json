@@ -1,0 +1,9 @@
+{
+    "intersections": [
+        {"id": 0, "name": "Part 1", "x": 100, "y": 250},
+        {"id": 1, "name": "Part 2", "x": 100, "y": 250}
+    ],
+    "roads": [
+        {"intersections": [0, 1], "directional": false}
+    ]
+}

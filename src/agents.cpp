@@ -4,6 +4,6 @@ void Agents::broadcastAgentPositions(double *positions, int numAgents)
 {
 }
 
-void Agents::initAgents(int numAgents)
-{
+void Agents::initAgentStates(int numAgents) {
+    
 }
