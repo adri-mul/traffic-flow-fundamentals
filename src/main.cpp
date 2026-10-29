@@ -26,7 +26,7 @@ void drawArrow(sf::RenderWindow& window, const Intersection* node1, const Inters
 }
 
 
-void drawRoadNetwork(sf::RenderWindow& window, RoadNetwork g) {
+void drawRoadNetwork(sf::RenderWindow& window, const RoadNetwork& g) {
 	for (Intersection* n : g.getVertices()) {
 		sf::CircleShape nodeShape(5.f);
 		nodeShape.setFillColor(GRAY);
@@ -46,13 +46,13 @@ void drawRoadNetwork(sf::RenderWindow& window, RoadNetwork g) {
 
 int main() {
 
-	RoadNetwork g = synthesizeNetworkFromFile("../data/road_network_example.json");
+	RoadNetwork g;
+	synthesizeNetworkFromFile("../data/road_network_example.json", g);
 
 	sf::RenderWindow window( sf::VideoMode( { SCREEN_WIDTH, SCREEN_HEIGHT } ), "SFML works!" );
 	window.setVerticalSyncEnabled(true); 
 	window.setFramerateLimit(60);
 	g.displayGraph();
-	cout << g.getVertices().size() << endl;
 	while ( window.isOpen() )
 	{
 		while ( const std::optional event = window.pollEvent() )

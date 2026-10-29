@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <iostream>
+#include <memory>
 #include <string>
 
 using namespace std;
@@ -34,19 +35,21 @@ struct Intersection {
 struct RoadSegment {
     Intersection* fromNode;
     Intersection* toNode;
-    short numLanes;
-    bool isOneWay;
+    short numLanes = 1;
+    bool isOneWay = false;
 };
 
 // Class to represent a road network through a graph
 class RoadNetwork {
     private:
         vector<Intersection*> verts;
+        vector<unique_ptr<RoadSegment>> roadSegments;
     public:
         void addVertices(vector<Intersection*> nodes);
         void addVertex(Intersection* n);
         void drawEdge(int n1, int n2);
-        vector<Intersection*> getVertices() { return verts; }
+        void addRoadSegment(Intersection* fromNode, Intersection* toNode, bool isOneWay);
+        vector<Intersection*> getVertices() const { return verts; }
         void displayGraph();
         vector<Intersection*> pathfind_bfs(Intersection* start, Intersection* end);
 };

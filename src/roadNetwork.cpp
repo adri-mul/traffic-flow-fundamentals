@@ -1,4 +1,5 @@
 #include "../include/roadNetwork.h"
+#include <utility>
 
 void RoadNetwork::addVertex(Intersection* n) {
     verts.push_back(n);
@@ -13,8 +14,14 @@ void RoadNetwork::addVertices(vector<Intersection*> nodes) {
 void RoadNetwork::drawEdge(int n1, int n2) {
     Intersection* firstNode = verts[n1];
     Intersection* secondNode = verts[n2];
-    RoadSegment road {firstNode, secondNode};
-    firstNode->connections.push_back(&road);
+    addRoadSegment(firstNode, secondNode, true);
+}
+
+// Function created with the help of AI
+void RoadNetwork::addRoadSegment(Intersection* fromNode, Intersection* toNode, bool isOneWay) {
+    auto segment = make_unique<RoadSegment>(RoadSegment{fromNode, toNode, 1 /* number of lanes */, isOneWay});
+    roadSegments.push_back(std::move(segment));
+    fromNode->connections.push_back(roadSegments.back().get());
 }
 
 // text-based graph display

@@ -8,4 +8,4 @@
 #include <unordered_map>
 #include "../include/roadNetwork.h"
 
-RoadNetwork synthesizeNetworkFromFile(const std::string& filename);
+void synthesizeNetworkFromFile(const std::string& filename, RoadNetwork& g);
