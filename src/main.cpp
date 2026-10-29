@@ -51,7 +51,8 @@ int main() {
 	sf::RenderWindow window( sf::VideoMode( { SCREEN_WIDTH, SCREEN_HEIGHT } ), "SFML works!" );
 	window.setVerticalSyncEnabled(true); 
 	window.setFramerateLimit(60);
-
+	g.displayGraph();
+	cout << g.getVertices().size() << endl;
 	while ( window.isOpen() )
 	{
 		while ( const std::optional event = window.pollEvent() )
@@ -61,7 +62,7 @@ int main() {
 		}
 
 		window.clear(sf::Color::Green);
-		g.displayGraph();
+		
 		drawRoadNetwork(window, g);
 		window.display();
 	}	

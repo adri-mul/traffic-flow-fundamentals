@@ -28,6 +28,7 @@ RoadNetwork synthesizeNetworkFromFile(const std::string& filename) {
         ownedNodes.reserve(intersections.size());
         vertices.reserve(intersections.size());
 
+        int i = 0;
         for (const json& intersection : intersections) {
             const int id = intersection.at("id").get<int>();
             const string name = intersection.at("name").get<string>();
@@ -43,6 +44,7 @@ RoadNetwork synthesizeNetworkFromFile(const std::string& filename) {
             ownedNodes.push_back(move(intersectionNode));
         }
 
+
         for (const json& road : roads) {
             const json& endpoints = road.at("intersections");
             if (!endpoints.is_array() || endpoints.size() != 2) {
@@ -57,7 +59,9 @@ RoadNetwork synthesizeNetworkFromFile(const std::string& filename) {
                 throw std::runtime_error("Road references an unknown intersection");
             }
             
-            // second gets the pointer. firstNode is unordered_map<int, node*>.
+            // cout << firstNode->second->connections.at(0);
+
+            // second gets the pointer. firstNode is unordered_map<int, node*>::iterator.
             RoadSegment segment = {firstNode->second, secondNode->second};
             firstNode->second->connections.push_back(&segment);
             if (!road.at("directional").get<bool>()) {
@@ -65,8 +69,9 @@ RoadNetwork synthesizeNetworkFromFile(const std::string& filename) {
                 secondNode->second->connections.push_back(&segmentNonDirectional);
             }
 
-            g.addVertices(vertices);
         }
+
+        g.addVertices(vertices);
 
         for (unique_ptr<Intersection>& intersectionNode : ownedNodes) {
             intersectionNode.release();
