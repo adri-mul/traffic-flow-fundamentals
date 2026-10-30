@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include "../include/roadNetwork.h"
 #include "../include/synthesizeNetwork.h"
+#include "../include/agents.h"
 #include <cmath>
 
 // Constants
@@ -8,6 +9,9 @@ const int NUM_VERTS = 10;
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 const sf::Color GRAY(128, 128, 128);
+
+// Parameters
+const int NUM_AGENTS = 10;
 
 void drawArrow(sf::RenderWindow& window, const Intersection* node1, const Intersection* node2, sf::Color color) {
 	std::array line = {
@@ -24,7 +28,6 @@ void drawArrow(sf::RenderWindow& window, const Intersection* node1, const Inters
 
 	window.draw(triangle);
 }
-
 
 void drawRoadNetwork(sf::RenderWindow& window, const RoadNetwork& g) {
 	for (Intersection* n : g.getVertices()) {
@@ -47,7 +50,27 @@ void drawRoadNetwork(sf::RenderWindow& window, const RoadNetwork& g) {
 int main() {
 
 	RoadNetwork g;
-	synthesizeNetworkFromFile("../data/road_network_example.json", g);
+	synthesizeNetworkFromFile("../data/sample_network_highway.json", g);
+	// synthesizeNetworkFromFile("../data/road_network_example.json", g);
+
+	Agents cars;
+	cars.initAgentStates(NUM_AGENTS);
+	vector<int> agentPos = cars.broadcastAgentPositions();
+	for (int i = 0; i < cars.numAgents; i++) {
+		cout << "Agent " << i << ": x-" << agentPos[i*2] << " y-" << agentPos[i*2+1] << endl;
+	}
+
+	// sample the densities at time t=0
+	RoadSegment* road = g.getVertices()[0]->connections[0];
+	road->data.fillDensitySamples(agentPos, agentPos.size());
+	cout << endl;
+	cout << endl;
+	// loop through density samples and print to console
+	for (int i = 0; i < road->data.densitySamples.size(); i++) {
+		cout << "Sample " << i << " density: " << road->data.densitySamples[i] << endl;
+	}
+	cout << endl;
+	cout << endl;
 
 	sf::RenderWindow window( sf::VideoMode( { SCREEN_WIDTH, SCREEN_HEIGHT } ), "SFML works!" );
 	window.setVerticalSyncEnabled(true); 

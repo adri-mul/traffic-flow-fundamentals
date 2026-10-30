@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <iostream>
 
 using namespace std;
 
@@ -14,10 +15,8 @@ struct RoadData {
     double roadLength; // placeholder, will collect from RoadSegment eventually
     double deltaX = 10; // sliding window, defaults to 10px
     vector<double> densitySamples;
-
+    // constructor
+    RoadData(double roadLength);
     // Functions
-    void fillDensitySamples();
-
-    private:
-        vector<double> requestAgentPositions();
+    void fillDensitySamples(vector<int> agentsPos, int numAgents);
 };

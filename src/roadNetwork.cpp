@@ -17,9 +17,18 @@ void RoadNetwork::drawEdge(int n1, int n2) {
     addRoadSegment(firstNode, secondNode, true);
 }
 
+// helper function created with the help of AI
+double getLength(Intersection* fromNode, Intersection* toNode) {
+    if (!fromNode || !toNode) return 0.0;
+    double dx = toNode->x - fromNode->x;
+    double dy = toNode->y - fromNode->y;
+    return std::hypot(dx, dy);
+}
+
 // Function created with the help of AI
 void RoadNetwork::addRoadSegment(Intersection* fromNode, Intersection* toNode, bool isOneWay) {
-    auto segment = make_unique<RoadSegment>(RoadSegment{fromNode, toNode, 1 /* number of lanes */, isOneWay});
+    RoadData data{getLength(fromNode, toNode)};
+    auto segment = make_unique<RoadSegment>(RoadSegment{fromNode, toNode, 1 /* number of lanes */, isOneWay, data});
     roadSegments.push_back(std::move(segment));
     fromNode->connections.push_back(roadSegments.back().get());
 }

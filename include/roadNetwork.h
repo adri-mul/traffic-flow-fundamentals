@@ -4,6 +4,9 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <cmath>
+
+#include "roadData.h"
 
 using namespace std;
 
@@ -37,6 +40,8 @@ struct RoadSegment {
     Intersection* toNode;
     short numLanes = 1;
     bool isOneWay = false;
+    RoadData data;
+    
 };
 
 // Class to represent a road network through a graph
