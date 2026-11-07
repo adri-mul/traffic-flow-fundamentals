@@ -33,7 +33,8 @@ FetchContent_MakeAvailable(nlohmann_json)
 
 # Build exec 'main'
 add_executable(main src/main.cpp src/roadNetwork.cpp src/synthesizeNetwork.cpp src/agents.cpp 
-               src/roadData.cpp)
+               src/roadData.cpp
+               src/model.cpp)
 target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE SFML::Graphics nlohmann_json::nlohmann_json)
 

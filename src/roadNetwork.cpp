@@ -27,7 +27,7 @@ double getLength(Intersection* fromNode, Intersection* toNode) {
 
 // Function created with the help of AI
 void RoadNetwork::addRoadSegment(Intersection* fromNode, Intersection* toNode, bool isOneWay) {
-    RoadData data{getLength(fromNode, toNode)};
+    RoadData data{getLength(fromNode, toNode), fromNode->x, toNode->x}; // TODO: x as a placeholder. Eventually, this should work for any orientation
     auto segment = make_unique<RoadSegment>(RoadSegment{fromNode, toNode, 1 /* number of lanes */, isOneWay, data});
     roadSegments.push_back(std::move(segment));
     fromNode->connections.push_back(roadSegments.back().get());

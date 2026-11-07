@@ -2,6 +2,7 @@
 #include "../include/roadNetwork.h"
 #include "../include/synthesizeNetwork.h"
 #include "../include/agents.h"
+#include "../include/model.h"
 #include <cmath>
 
 // Constants
@@ -50,8 +51,10 @@ void drawRoadNetwork(sf::RenderWindow& window, const RoadNetwork& g) {
 int main() {
 
 	RoadNetwork g;
+	Greenshield g_shield;
+	cout << g_shield.max_flow << endl;
+	LWR<Greenshield>* lwr_model = new LWR(g_shield);
 	synthesizeNetworkFromFile("../data/sample_network_highway.json", g);
-	// synthesizeNetworkFromFile("../data/road_network_example.json", g);
 
 	Agents cars;
 	cars.initAgentStates(NUM_AGENTS);
@@ -62,7 +65,7 @@ int main() {
 
 	// sample the densities at time t=0
 	RoadSegment* road = g.getVertices()[0]->connections[0];
-	road->data.fillDensitySamples(agentPos, agentPos.size());
+	road->data.fillDensitySamples(agentPos, agentPos.size()/2);
 	cout << endl;
 	cout << endl;
 	// loop through density samples and print to console
@@ -72,7 +75,12 @@ int main() {
 	cout << endl;
 	cout << endl;
 
-	sf::RenderWindow window( sf::VideoMode( { SCREEN_WIDTH, SCREEN_HEIGHT } ), "SFML works!" );
+	vector<double> velocities = lwr_model->modelVelocity(road->data.densitySamples);
+
+	// Save density and velocity data to csv
+	road->data.saveDataToCSV(road->data.densitySamples, "../data/density.csv", "number", "density");
+	road->data.saveDataToCSV(velocities, "../data/velocity.csv", "number", "velocity");
+	sf::RenderWindow window( sf::VideoMode( { SCREEN_WIDTH, SCREEN_HEIGHT } ), "Traffic Sim Project" );
 	window.setVerticalSyncEnabled(true); 
 	window.setFramerateLimit(60);
 	g.displayGraph();
