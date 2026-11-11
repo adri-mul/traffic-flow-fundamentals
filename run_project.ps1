@@ -11,3 +11,7 @@ Write-Output "Running testing suite..."
 
 Write-Output "Running project..."
 cmake --build build --target run
+
+# plot graphs
+Write-Output "Plotting graphs..."
+python .\scripts\plot_csv.py "C:\Users\adria\Documents\traffic-flow-fundamentals\build\data\density.csv" "C:\Users\adria\Documents\traffic-flow-fundamentals\build\data\velocity.csv" 

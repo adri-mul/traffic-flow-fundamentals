@@ -44,4 +44,29 @@ struct RoadData {
         std::cout << "Wrote to file " << filepath << std::endl;
         return true;
     }
+
+    template<typename T>
+    bool saveDataToCSV(vector<T> dataVector, vector<int> varVector, const string& filepath, const string& csvHeaderAxisX, const string& csvHeaderAxisY) {
+        try { 
+            if (dataVector.size() != varVector.size()) {
+                std::cout << "data and variable sizes must be the same! (roadData.h)" << std::endl;
+                return false;
+            }
+
+            ofstream file(filepath);
+            file << csvHeaderAxisX << "," << csvHeaderAxisY << "\n";
+            for (int i = 0; i < dataVector.size(); i++) {
+                file << varVector[i] << "," << dataVector[i] << "\n";
+            }
+            file.close();
+        } catch (const ostream::failure& e) {
+            std::cout << "Error writing to file " << filepath << std::endl;
+            return false;
+        } catch (exception e) {
+            std::cout << "Unresolved error in saving data to a CSV. Error occured in roadData.h in function saveDataToCSV." << std::endl;
+            return false;
+        }
+        std::cout << "Wrote to file " << filepath << std::endl;
+        return true;
+    }
 };

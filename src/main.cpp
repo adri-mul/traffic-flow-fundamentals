@@ -12,7 +12,7 @@ const int SCREEN_HEIGHT = 600;
 const sf::Color GRAY(128, 128, 128);
 
 // Parameters
-const int NUM_AGENTS = 10;
+const int NUM_AGENTS = 400;
 
 void drawArrow(sf::RenderWindow& window, const Intersection* node1, const Intersection* node2, sf::Color color) {
 	std::array line = {
@@ -59,9 +59,9 @@ int main() {
 	Agents cars;
 	cars.initAgentStates(NUM_AGENTS);
 	vector<int> agentPos = cars.broadcastAgentPositions();
-	for (int i = 0; i < cars.numAgents; i++) {
-		cout << "Agent " << i << ": x-" << agentPos[i*2] << " y-" << agentPos[i*2+1] << endl;
-	}
+	// for (int i = 0; i < cars.numAgents; i++) {
+	// 	cout << "Agent " << i << ": x-" << agentPos[i*2] << " y-" << agentPos[i*2+1] << endl;
+	// }
 
 	// sample the densities at time t=0
 	RoadSegment* road = g.getVertices()[0]->connections[0];
@@ -69,17 +69,21 @@ int main() {
 	cout << endl;
 	cout << endl;
 	// loop through density samples and print to console
-	for (int i = 0; i < road->data.densitySamples.size(); i++) {
-		cout << "Sample " << i << " density: " << road->data.densitySamples[i] << endl;
-	}
+	// for (int i = 0; i < road->data.densitySamples.size(); i++) {
+	// 	cout << "Sample " << i << " density: " << road->data.densitySamples[i] << endl;
+	// }
 	cout << endl;
 	cout << endl;
 
 	vector<double> velocities = lwr_model->modelVelocity(road->data.densitySamples);
-
+	vector<int> variables;
+	variables.reserve(velocities.size());
+	for (int i = 0; i < velocities.size(); i++) {
+		variables.push_back(100 + i * 10);
+	}
 	// Save density and velocity data to csv
-	road->data.saveDataToCSV(road->data.densitySamples, "../data/density.csv", "number", "density");
-	road->data.saveDataToCSV(velocities, "../data/velocity.csv", "number", "velocity");
+	road->data.saveDataToCSV(road->data.densitySamples, variables, "../data/density.csv", "distance (px)", "density (vehicles/px)");
+	road->data.saveDataToCSV(velocities, variables, "../data/velocity.csv", "distance (px)", "velocity");
 	sf::RenderWindow window( sf::VideoMode( { SCREEN_WIDTH, SCREEN_HEIGHT } ), "Traffic Sim Project" );
 	window.setVerticalSyncEnabled(true); 
 	window.setFramerateLimit(60);

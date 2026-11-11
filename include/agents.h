@@ -15,4 +15,5 @@ struct Agents {
         void initAgentStates(int numAgents);
     private:
         vector<int> agentPositions;
+        double distrCurve(int x);
 };
