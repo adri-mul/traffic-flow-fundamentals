@@ -1,35 +1,93 @@
 #include <SFML/Graphics.hpp>
 #include "../include/roadNetwork.h"
 #include "../include/synthesizeNetwork.h"
-#include <random>
+#include "../include/agents.h"
+#include "../include/model.h"
+#include <cmath>
 
-int main()
-{
-	// Constants
-	const int NUM_VERTS = 10;
-	const int SCREEN_WIDTH = 800;
-	const int SCREEN_HEIGHT = 600;
+// Constants
+const int NUM_VERTS = 10;
+const int SCREEN_WIDTH = 800;
+const int SCREEN_HEIGHT = 600;
+const sf::Color GRAY(128, 128, 128);
 
-	// Quick graph test
-	// RoadNetwork g;
-	// random_device rd;
-	// mt19937 gen(rd());
-	
-	// for (int i = 0; i < NUM_VERTS; i++) {
-	// 	g.addVertex(new node(gen() % SCREEN_WIDTH, gen() % SCREEN_HEIGHT));
-	// 	if (i > 0) {
-	// 		g.drawEdge(i - 1, i); // Connect each node to the previous
-	// 	}
-	// 	// g.drawEdge(i, i); // Connect each node to the previous
+// Parameters
+const int NUM_AGENTS = 400;
+
+void drawArrow(sf::RenderWindow& window, const Intersection* node1, const Intersection* node2, sf::Color color) {
+	std::array line = {
+		sf::Vertex{sf::Vector2f(node1->x, node1->y), color},
+		sf::Vertex{sf::Vector2f(node2->x, node2->y), color}
+	};
+	window.draw(line.data(), line.size(), sf::PrimitiveType::Lines);
+
+	sf::Angle angle = sf::degrees(std::atan2(node2->y - node1->y, node2->x - node1->x) * 180.0 / M_PI);
+
+	sf::CircleShape triangle(5.f, 3);
+	triangle.setRotation(angle);
+	triangle.setPosition({node2->x, node2->y});
+
+	window.draw(triangle);
+}
+
+void drawRoadNetwork(sf::RenderWindow& window, const RoadNetwork& g) {
+	for (Intersection* n : g.getVertices()) {
+		sf::CircleShape nodeShape(5.f);
+		nodeShape.setFillColor(GRAY);
+		nodeShape.setPosition({n->x-5, n->y-5});
+		for (const RoadSegment* conn : n->connections) {
+			std::array line = {	// defines a line between the node and its connection
+				sf::Vertex{sf::Vector2f(n->x, n->y), GRAY},
+				sf::Vertex{sf::Vector2f(conn->toNode->x, conn->toNode->y), GRAY}
+			};
+			window.draw(line.data(), line.size(), sf::PrimitiveType::Lines);
+			// drawArrow(window, n, conn, GRAY);
+		}
+		
+		window.draw(nodeShape);
+	}
+}
+
+int main() {
+
+	RoadNetwork g;
+	Greenshield g_shield;
+	cout << g_shield.max_flow << endl;
+	LWR<Greenshield>* lwr_model = new LWR(g_shield);
+	synthesizeNetworkFromFile("../data/sample_network_highway.json", g);
+
+	Agents cars;
+	cars.initAgentStates(NUM_AGENTS);
+	vector<int> agentPos = cars.broadcastAgentPositions();
+	// for (int i = 0; i < cars.numAgents; i++) {
+	// 	cout << "Agent " << i << ": x-" << agentPos[i*2] << " y-" << agentPos[i*2+1] << endl;
 	// }
-	// g.displayGraph();
 
-	RoadNetwork g = synthesizeNetworkFromFile("../data/road_network_example.json");
+	// sample the densities at time t=0
+	RoadSegment* road = g.getVertices()[0]->connections[0];
+	road->data.fillDensitySamples(agentPos, agentPos.size()/2);
+	cout << endl;
+	cout << endl;
+	// loop through density samples and print to console
+	// for (int i = 0; i < road->data.densitySamples.size(); i++) {
+	// 	cout << "Sample " << i << " density: " << road->data.densitySamples[i] << endl;
+	// }
+	cout << endl;
+	cout << endl;
 
-	sf::RenderWindow window( sf::VideoMode( { SCREEN_WIDTH, SCREEN_HEIGHT } ), "SFML works!" );
+	vector<double> velocities = lwr_model->modelVelocity(road->data.densitySamples);
+	vector<int> variables;
+	variables.reserve(velocities.size());
+	for (int i = 0; i < velocities.size(); i++) {
+		variables.push_back(100 + i * 10);
+	}
+	// Save density and velocity data to csv
+	road->data.saveDataToCSV(road->data.densitySamples, variables, "../data/density.csv", "distance (px)", "density (vehicles/px)");
+	road->data.saveDataToCSV(velocities, variables, "../data/velocity.csv", "distance (px)", "velocity");
+	sf::RenderWindow window( sf::VideoMode( { SCREEN_WIDTH, SCREEN_HEIGHT } ), "Traffic Sim Project" );
 	window.setVerticalSyncEnabled(true); 
 	window.setFramerateLimit(60);
-
+	g.displayGraph();
 	while ( window.isOpen() )
 	{
 		while ( const std::optional event = window.pollEvent() )
@@ -38,21 +96,9 @@ int main()
 				window.close();
 		}
 
-		window.clear();
-		for (node* n : g.getVertices()) {
-			sf::CircleShape nodeShape(5.f);
-			nodeShape.setFillColor(sf::Color::Red);
-			nodeShape.setPosition({n->x-5, n->y-5});
-			for (const node* conn : n->connections) {
-				std::array line = {	// defines a line between the node and its connection
-					sf::Vertex{sf::Vector2f(n->x, n->y), sf::Color::Red},
-					sf::Vertex{sf::Vector2f(conn->x, conn->y), sf::Color::Red}
-				};
-				window.draw(line.data(), line.size(), sf::PrimitiveType::Lines);
-			}
-			
-			window.draw(nodeShape);
-		}
+		window.clear(sf::Color::Green);
+		
+		drawRoadNetwork(window, g);
 		window.display();
 	}	
 }

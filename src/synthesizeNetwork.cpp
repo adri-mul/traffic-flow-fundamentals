@@ -3,13 +3,12 @@
 using namespace std;
 
 // Function created with the help of AI
-RoadNetwork synthesizeNetworkFromFile(const std::string& filename) {
-    RoadNetwork g;
+void synthesizeNetworkFromFile(const std::string& filename, RoadNetwork& g) {
     ifstream infile;
     infile.open(filename);
     if (!infile) {
         std::cerr << "Error opening file: " << filename << std::endl;
-        return g;
+        return;
     }
 
     try {
@@ -22,10 +21,10 @@ RoadNetwork synthesizeNetworkFromFile(const std::string& filename) {
             throw std::runtime_error("'intersections' and 'roads' must be arrays");
         }
 
-        vector<unique_ptr<node>> ownedNodes;  // list of nodes with unique_ptr attached to them (used to clean up at the end)
-        vector<node*> vertices;
-        unordered_map<int, node*> nodesById;
-        ownedNodes.reserve(intersections.size());
+        // vector<unique_ptr<Intersection>> ownedNodes;  // list of nodes with unique_ptr attached to them (used to clean up at the end)
+        vector<Intersection*> vertices;
+        unordered_map<int, Intersection*> nodesById;
+        // ownedNodes.reserve(intersections.size());
         vertices.reserve(intersections.size());
 
         for (const json& intersection : intersections) {
@@ -34,14 +33,15 @@ RoadNetwork synthesizeNetworkFromFile(const std::string& filename) {
             const double x = intersection.at("x").get<double>();
             const double y = intersection.at("y").get<double>();
 
-            auto intersectionNode = make_unique<node>(id, name, x, y);
-            if (!nodesById.emplace(id, intersectionNode.get()).second) { // If the map has more than one element with key 'id', .second returns false (fail)
+            Intersection* intersectionNode = new Intersection(id, name, x, y);
+            if (!nodesById.emplace(id, intersectionNode).second) { // If the map has more than one element with key 'id', .second returns false (fail)
                 throw std::runtime_error("Duplicate intersection id: " + to_string(id));
             }
             // Add the nodes
-            vertices.push_back(intersectionNode.get());
-            ownedNodes.push_back(move(intersectionNode));
+            vertices.push_back(intersectionNode);
+            // ownedNodes.push_back(move(intersectionNode));
         }
+
 
         for (const json& road : roads) {
             const json& endpoints = road.at("intersections");
@@ -57,20 +57,27 @@ RoadNetwork synthesizeNetworkFromFile(const std::string& filename) {
                 throw std::runtime_error("Road references an unknown intersection");
             }
             
-            // second gets the pointer. firstNode is unordered_map<int, node*>.
-            firstNode->second->connections.push_back(secondNode->second);
-            if (!road.at("directional").get<bool>()) {
-                secondNode->second->connections.push_back(firstNode->second);
+            // for (const auto& networkNode : firstNode->second->connections) {
+            //     cout << "(" << networkNode->toNode->x << ", " << networkNode->toNode->y << ")";
+            // }
+            // cout << endl;
+            const bool isOneWay = road.at("directional").get<bool>();
+            g.addRoadSegment(firstNode->second, secondNode->second, isOneWay);
+            if (!isOneWay) {
+                g.addRoadSegment(secondNode->second, firstNode->second, false);
             }
+
         }
 
         g.addVertices(vertices);
-        for (unique_ptr<node>& intersectionNode : ownedNodes) {
-            intersectionNode.release();
-        }
+        cout << "Vertices size: " << g.getVertices().size() << endl;
+        // g.displayGraph();
+
+        // for (unique_ptr<Intersection>& intersectionNode : ownedNodes) {
+        //     intersectionNode.release();
+        // }
         infile.close();
     } catch (const std::exception& error) {
         std::cerr << "Error parsing road network: " << error.what() << std::endl;
     }
-    return g;
 }
